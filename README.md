@@ -1,6 +1,8 @@
 # California Citrus Manuscript Code and Data
 Code and data associated with the Ginnan et al. (2026) manuscript 'Orchard management alters citrus root and rhizosphere microbiomes with functional consequences for plant performance'
 
+Zenodo repository (pre-release): [![DOI](https://zenodo.org/badge/1193131457.svg)](https://doi.org/10.5281/zenodo.19243975)
+
 ## Field tree root/rhizo microbiome analyses
 #### Data file(s)
 These phyloseq objects were produced from raw reads using the workflow outlined here: [ECDRE.Microbiome.Amp-seq.processing repository](https://github.com/nginn001/ECDRE.Microbiome.Amp-seq.processing)
