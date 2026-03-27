@@ -1,8 +1,9 @@
 # Script created December 3, 2025 by Nichole Ginnan, Assistant Project Scientist (nginn001@ucr.edu)
+# Last updated March 26, 2026
 # Amplicon sequencing microbiome data analysis
 # ECDRE Project, Lead PI: Caroline Roper, funded by the USDA
 # Lindcove Research and Extension Center, Exeter, California | 91C plot experiment
-# Field experiment testing the impacts of mulch, glyphosate, and humic acid on Tango on Carrizo rootstock microbiome
+# Field experiment testing the impacts of mulch, glyphosate, and humic acid citrus tree microbiome
 # 16S bacterial and ITS fungal communities
 ###############################################################################
 # Load Libraries ####
@@ -20,9 +21,6 @@ library(RColorBrewer)
 library(vegan)
 library(microbiome)
 library(ALDEx2)
-library(pheatmap)
-library(eulerr) # for Venn Diagram
-library(brglm2)
 ###############################################################################
 # Load data objects; centered log-ratio transformed phyloseq objects ####
 setwd("/Users/nicholeginnan/Documents/UCR- Current/CA.citrus.paper") # set working directory
@@ -35,15 +33,13 @@ bac.r.ps<- subset_samples(bac.clr.ps, Tissue_type == "Roots")
 bac.z.ps<- subset_samples(bac.clr.ps, Tissue_type == "Rhizosphere")
 fun.r.ps<- subset_samples(fun.clr.ps, Tissue_type == "Roots")
 fun.z.ps<- subset_samples(fun.clr.ps, Tissue_type == "Rhizosphere")
-fun.l.ps<- subset_samples(fun.clr.ps, Tissue_type == "Leaves")
-# remove year zero (pre-treatment) #
+# remove year zero (pre-treatment year and only use years 1-3) #
 bac.r.ps.treat <- subset_samples(bac.r.ps, Timepoint == "T1" | Timepoint == "T2" | Timepoint == "T3") 
 bac.z.ps.treat <- subset_samples(bac.z.ps, Timepoint == "T1" | Timepoint == "T2" | Timepoint == "T3") 
 fun.r.ps.treat <- subset_samples(fun.r.ps, Timepoint == "T1" | Timepoint == "T2" | Timepoint == "T3") 
 fun.z.ps.treat <- subset_samples(fun.z.ps, Timepoint == "T1" | Timepoint == "T2" | Timepoint == "T3") 
-fun.l.ps.treat <- subset_samples(fun.l.ps, Timepoint == "T1" | Timepoint == "T2" | Timepoint == "T3") 
 ###############################################################################
-####### Alpha Diversity #############
+####### Alpha Diversity ###################################################
 ###############################################################################
 # Plot settings ####
 plot.theme<- theme(legend.title = element_blank(), 
@@ -608,13 +604,9 @@ ggplot(cap.z.df,aes(x=CAP1,y=CAP2,color=Mulch,fill = Mulch, shape=Humic_acid))+
         axis.text.y= element_text(colour="black", size=8, family="sans"))
 ggsave(filename= "CAP.fun.rhizosphere.humic.gly.mulch.classic.pdf", device="pdf", units="mm", dpi=300, width=150, height=100, path="plots/")
 
-###############################################################################
-####### Microbiome and Tree phenotype comparison #############
-###############################################################################
-
-###############################################################################
-####### Taxa enrichment | ALDeX2 | Mulch vs. no mulch  #############
-###############################################################################
+##########################################################################################
+# Taxa enrichment | ALDeX2 | Mulch vs. no mulch, Gly vs. no gly, & humic vs. no humic ###########
+##########################################################################################
 # Load data objects; raw counts phyloseq objects ####
 bac.raw.ps<-readRDS("data_tables/microbiome/CA.raw.counts.16S.greengenes.phyloseq.obj.RDS")
 fun.raw.ps<-readRDS("data_tables/microbiome/CA.raw.counts.ITS.UNITE.phyloseq.obj.RDS")
@@ -703,7 +695,7 @@ sum(ttest.humic.bac.r$wi.eBH < 0.10) # #0
 sum(ttest.humic.bac.r$we.eBH < 0.10) # #0
 sum(ttest.gly.bac.r$wi.eBH < 0.10) # #0
 sum(ttest.gly.bac.r$we.eBH < 0.10) # #0
-which(ttest.mulch.bac.r$wi.eBH < 0.10) # 332 751
+which(ttest.mulch.bac.r$wi.eBH < 0.10) # 
 ttest.mulch.bac.r[751,] #                 we.ep     we.eBH       wi.ep    wi.eBH
 #                         bASV_454 1.821362e-05 0.01459005 3.030338e-06 0.006861652
 #                         bASV_1248 0.0005080577 0.1324709 4.544337e-05 0.04883881
@@ -722,7 +714,7 @@ sum(ttest.humic.fun.r$wi.eBH < 0.10) # #0
 sum(ttest.humic.fun.r$we.eBH < 0.10) # #0
 sum(ttest.gly.fun.r$wi.eBH < 0.10) # #0
 sum(ttest.gly.fun.r$we.eBH < 0.10) # #0
-which(ttest.mulch.fun.r$wi.eBH < 0.10) # 57 75
+which(ttest.mulch.fun.r$wi.eBH < 0.10) # line 57 75
 ttest.mulch.fun.r[75,] #                 we.ep     we.eBH       wi.ep    wi.eBH
 #                         fASV_82 5.829072e-07 0.0004250923 2.972437e-06 0.002655061 candolleomyces
 #                         fASV_110 3.096898e-06 0.002065975 3.973622e-05 0.02239465  candolleomyces
@@ -1055,409 +1047,8 @@ ggplot(volc, aes(x = effect, y = neglog10_q)) +
         axis.text.y= element_text(colour="black", size=8, family="sans"))
 ggsave(filename= "fun.z.mulch.volcano.pdf", device="pdf", units="mm", dpi=300, width=75, height=100, path="plots/")
 
+##### Take a look at the read counts for Pleurostoma ASVs ####
 fun.z.ps.raw.treat.mulch<-merge_samples(fun.z.ps.raw.treat, "Mulch")
 fun.z.raw.treat.mulch.OTU<-t(data.frame(otu_table(fun.z.ps.raw.treat.mulch)))
 Pleurostoma.ASVs <- c("fASV_711","fASV_762","fASV_1326","fASV_6546","fASV_6594")
 fun.z.raw.treat.mulch.OTU.Pleuristoma <- fun.z.raw.treat.mulch.OTU[rownames(fun.z.raw.treat.mulch.OTU) %in% Pleurostoma.ASVs, ]
-
-###########################################
-##### Presence/absence Genus-level ########
-### Raw counts, genus-level ps objects #
-# run each object through the pipeline and save tables
-ps <- bac.r.ps.raw.treat
-ps <- bac.z.ps.raw.treat
-ps <- fun.r.ps.raw.treat
-ps <- fun.z.ps.raw.treat
-## how many samples in each group?
-table(sample_data(ps)$Mulch, useNA = "ifany")
-##  agglomerate to Genus 
-ps_gen <- tax_glom(ps, taxrank = "Genus", NArm = FALSE)
-## presence/absence at genus level 
-# otu_table can be taxa_are_rows or not; handle both
-otu <- as(otu_table(ps_gen), "matrix")
-if (!taxa_are_rows(ps_gen)) otu <- t(otu)
-pa <- (otu > 0) * 1  # taxa x samples, 0/1
-## count, within each Mulch group, how many samples each genus appears in
-mulch_vec <- as.character(sample_data(ps_gen)$Mulch)
-idx_mulch <- which(mulch_vec == "mulch")
-idx_no    <- which(mulch_vec == "no")
-# genus presence counts = number of samples with 1's
-n_mulch <- rowSums(pa[, idx_mulch, drop = FALSE])
-n_no    <- rowSums(pa[, idx_no,    drop = FALSE])
-## present if >= 5 samples
-present_mulch <- n_mulch >= 5
-present_no    <- n_no    >= 5
-## build comparison table
-genus_names <- as.character(tax_table(ps_gen)[, "Genus"])
-# If Genus is NA, label it so it doesn't silently disappear
-genus_names[is.na(genus_names) | genus_names == ""] <- "Genus_unassigned"
-res <- data.frame(
-  Genus = genus_names,
-  n_samples_mulch = n_mulch,
-  n_samples_no    = n_no,
-  present_mulch   = present_mulch,
-  present_no      = present_no,
-  category = ifelse(present_mulch & present_no, "shared",
-                    ifelse(present_mulch & !present_no, "mulch_only",
-                           ifelse(!present_mulch & present_no, "no_only", "neither"))),
-  row.names = taxa_names(ps_gen),
-  stringsAsFactors = FALSE
-)
-
-# Optional: collapse duplicate genus labels (tax_glom should prevent most duplicates,
-# but unassigned/NA can repeat)
-res_summary <- aggregate(
-  cbind(n_samples_mulch, n_samples_no) ~ Genus,
-  data = res,
-  FUN = max)
-res_summary$present_mulch <- res_summary$n_samples_mulch >= 5
-res_summary$present_no    <- res_summary$n_samples_no    >= 5
-res_summary$category <- with(res_summary,
-                             ifelse(present_mulch & present_no, "shared",
-                                    ifelse(present_mulch & !present_no, "mulch_only",
-                                           ifelse(!present_mulch & present_no, "no_only", "neither"))))
-
-## quick counts + lists
-table(res_summary$category)
-
-###### Save to corresponding tables 
-mulch_only.bac.r <- res_summary$Genus[res_summary$category == "mulch_only"]
-write.table(mulch_only.bac.r, file="data_tables/presence.absence/Genus.mulch.only.bac.r.csv", sep=",")
-no_only.bac.r    <- res_summary$Genus[res_summary$category == "no_only"]
-write.table(no_only.bac.r, file="data_tables/presence.absence/Genus.no.only.bac.r.csv", sep=",")
-shared.bac.r    <- res_summary$Genus[res_summary$category == "shared"]
-write.table(shared.bac.r, file="data_tables/presence.absence/Genus.shared.bac.r.csv", sep=",")
-
-mulch_only.bac.z <- res_summary$Genus[res_summary$category == "mulch_only"]
-no_only.bac.z    <- res_summary$Genus[res_summary$category == "no_only"]
-shared.bac.z    <- res_summary$Genus[res_summary$category == "shared"]
-write.table(mulch_only.bac.z, file="data_tables/presence.absence/Genus.mulch.only.bac.z.csv", sep=",")
-write.table(no_only.bac.z, file="data_tables/presence.absence/Genus.no.only.bac.z.csv", sep=",")
-write.table(shared.bac.z, file="data_tables/presence.absence/Genus.shared.bac.z.csv", sep=",")
-
-mulch_only.fun.r <- res_summary$Genus[res_summary$category == "mulch_only"]
-no_only.fun.r    <- res_summary$Genus[res_summary$category == "no_only"]
-shared.fun.r    <- res_summary$Genus[res_summary$category == "shared"]
-write.table(mulch_only.fun.r, file="data_tables/presence.absence/Genus.mulch.only.fun.r.csv", sep=",")
-write.table(no_only.fun.r, file="data_tables/presence.absence/Genus.no.only.fun.r.csv", sep=",")
-write.table(shared.fun.r, file="data_tables/presence.absence/Genus.shared.fun.r.csv", sep=",")
-
-mulch_only.fun.z <- res_summary$Genus[res_summary$category == "mulch_only"]
-no_only.fun.z    <- res_summary$Genus[res_summary$category == "no_only"]
-shared.fun.z    <- res_summary$Genus[res_summary$category == "shared"]
-write.table(mulch_only.fun.z, file="data_tables/presence.absence/Genus.mulch.only.fun.z.csv", sep=",")
-write.table(no_only.fun.z, file="data_tables/presence.absence/Genus.no.only.fun.z.csv", sep=",")
-write.table(shared.fun.z, file="data_tables/presence.absence/Genus.shared.fun.z.csv", sep=",")
-
-###################################################
-##### greenhouse experiment #######################
-###################################################
-# Plant count in December (germination rates)
-df <- tibble(
-  soil = c("CCC","CCH","CGC","CGH","MCC","MCH","MGC","MGH",
-           "CCC","CCH","CGC","CGH","MCC","MCH","MGC","MGH"),
-  plant_cnt = c(16,16,14,16,14,15,16,15,
-                14,16,11,6,4,4,7,9),
-  treatment = c(rep("Autoclaved", 8), rep("Active", 8)),
-  total = 16)
-
-df <- df %>%mutate(dead = total - plant_cnt)
-df <- df %>% mutate(mulch = case_when(
-      substr(soil, 1, 1) == "C" ~ "no",
-      substr(soil, 1, 1) == "M" ~ "mulch",
-      TRUE ~ NA_character_))
-df <- df %>% mutate(gly = case_when(
-  substr(soil, 2, 2) == "C" ~ "no",
-  substr(soil, 2, 2) == "G" ~ "gly",
-  TRUE ~ NA_character_))
-df <- df %>% mutate(humic = case_when(
-  substr(soil, 3, 3) == "C" ~ "no",
-  substr(soil, 3, 3) == "H" ~ "humic",
-  TRUE ~ NA_character_))
-## emerged model #
-model <- glm(cbind(plant_cnt, dead) ~ mulch*gly+mulch*humic*treatment, family = binomial,data = df)
-anova(model, test = "Chisq")
-emm <- emmeans(model,~ gly:mulch:humic|treatment,type = "response")
-pairs(emm, adjust = "fdr")
-cld_soil <- cld(emm,alpha = 0.05,adjust = "fdr",Letters = LETTERS)
-## emerged count plot #
-ggplot(df, aes(x = soil,y = plant_cnt/total, fill=mulch)) +
-  geom_col(position = position_dodge(width = 0.8),color="black") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  scale_fill_manual(values=c("#0065a2", "#00b0ba"),limits=c("mulch","no"),labels = c("mulch","no mulch")) +
-  facet_grid(.~treatment)+
-  labs(x = "Soil Microbiota", y = "Plants emerged (%)") + 
-  theme_classic()
-
-#### End of greenhouse experiment plant traits ####
-plant<-read_excel("data_tables/plant_greenhouse_data.xlsx",col_names = TRUE)
-plant.2 <- plant %>% filter(end_status != "none")
-## established #### binary response model ####
-plant$established <- ifelse(plant$end_status == "none", 1, 0)
-plant_A <- subset(plant, Active.or.killed == "A")
-
-m_establish_firth <- glm(established ~ mulch * gly *humic,data = plant_A, family = binomial("logit"),method = "brglmFit")
-summary(m_establish_firth)
-anova(m_establish_firth, test = "Chisq")
-#Analysis of Deviance Table
-#.                Df Deviance Resid. Df Resid. Dev  Pr(>Chi)    
-# NULL                              127    174.308              
-# mulch            1   50.010       126    124.298 1.529e-12 ***
-# gly              1   10.242       125    114.055 0.0013725 ** 
-# humic            1    5.572       124    108.484 0.0182537 *  
-# mulch:gly        1   13.899       123     94.585 0.0001929 ***
-# mulch:humic      1    1.489       122     93.096 0.2223886    
-# gly:humic        1    0.869       121     92.227 0.3513010    
-# mulch:gly:humic  1    2.810       120     89.417 0.0936870 .  
-emm <- emmeans(m_establish_firth, ~ mulch:gly:humic, type = "response")
-pairs(emm, adjust = "fdr")
-cld_soil <- cld(emm, alpha = 0.05, adjust = "fdr", Letters = LETTERS)
-#### plot % plants established ####
-established.cnt<-plant.2%>%count(mulch,gly,humic,Active.or.killed)
-established.cnt <- established.cnt %>%mutate(Treatment = paste(mulch, gly, humic, sep = "_"))
-
-ggplot(established.cnt, aes(x = Treatment,y = (n/16), fill=mulch)) +
-  geom_col(position = position_dodge(width = 0.8),color="black") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  facet_grid(.~Active.or.killed,labeller = labeller(Active.or.killed = c("A" = "Active", "K" = "Autoclaved"))) +
-  scale_x_discrete(labels = c("no_no_no"="CCC","no_no_humic"="CCH","no_gly_no"="CGC","no_gly_humic"="CGH",
-                              "mulch_no_no"="MCC","mulch_no_humic"="MCH","mulch_gly_no"="MGC","mulch_gly_humic"="MGH"),
-                   limits = c("no_no_no","no_no_humic","no_gly_no","no_gly_humic",
-                              "mulch_no_no","mulch_no_humic","mulch_gly_no","mulch_gly_humic"))+
-  scale_fill_manual(values=c("#0065a2", "#00b0ba"),limits=c("mulch","no"),labels = c("mulch","no mulch")) +
-  labs(x = "Soil Microbiota", y = "Plants established (%)") + 
-  theme_classic() +
-  theme(legend.title = element_text(size=10,family="sans"), 
-        legend.text=element_text(size=10,family="sans"),
-        legend.position="right",
-        legend.box.spacing = unit(0.0, "pt"),
-        legend.spacing.x = unit(5.0, 'pt'),
-        axis.title.x= element_text(size=10, family="sans", vjust = 0.4),
-        strip.text.x = element_text(size = 10),
-        axis.title.y=element_text(size=10, family="sans",vjust = 1), 
-        panel.background = element_rect(colour = "black",linewidth=1),
-        #strip.background=element_blank(),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.spacing=unit(0.3, "lines"),
-        axis.text.x= element_text(colour="black", size=8, family="sans", angle=25, hjust=1), 
-        axis.text.y= element_text(colour="black", size=8, family="sans"))
-ggsave(filename= "GH.bar.established.legend.pdf", device="pdf", units="mm", dpi=300, width=150, height=80, path="plots/")
-
-########## growth ###########################
-########################
-### Root biomass #####
-#######################
-# Plot raw data to identify major outliers
-ggplot(plant.2, aes(x=Soil, y= rt_mass_g,color=Active.or.killed)) + 
-  geom_boxplot(outliers = FALSE) +
-  geom_point(alpha=0.2, position=position_jitterdodge(0.2), size=2) +
-  geom_text(aes(label=Placement), position=position_jitterdodge(0.2), 
-            vjust=-0.5, size=3, alpha=0.7, check_overlap=TRUE) +
-  theme_classic()
-# remove major outliers from the dataset to improve model fit
-outliers<-as.character(c("D1_27","C1_23")) 
-plant.3<-plant.2 %>% filter(!Placement %in% outliers)# model
-# Root mass model
-#m_root <- lmer((rt_mass_g) ~ mulch*gly*Active.or.killed*humic + (1|Block),data = plant.3)
-ranova(m_root)
-m_root <- lm(rt_mass_g ~ mulch*gly*Active.or.killed+humic,data = plant.3) # reduced model
-plot(m_root)
-qqnorm(resid(m_root));qqline(resid(m_root))
-anova(m_root)
-#.                             Df  Sum Sq Mean Sq F value    Pr(>F)    
-# mulch                        1 0.00121 0.00121  0.2922  0.589529    
-# gly                          1 0.00039 0.00039  0.0935  0.760162    
-# Active.or.killed             1 0.34150 0.34150 82.4715 2.563e-16 ***
-# humic                        1 0.05486 0.05486 13.2494  0.000361 ***
-# mulch:gly                    1 0.00124 0.00124  0.2996  0.584876    
-# mulch:Active.or.killed       1 0.03178 0.03178  7.6746  0.006220 ** 
-# gly:Active.or.killed         1 0.00395 0.00395  0.9535  0.330222    
-# mulch:gly:Active.or.killed   1 0.01669 0.01669  4.0294  0.046290 *  
-# Residuals                  171 0.70809 0.00414                      
-## Plot Root mass ####
-emm_main<-emmeans(m_root, specs=~humic:Active.or.killed, type="response") # significant
-emm_interact<-emmeans(m_root, specs=~mulch:gly:Active.or.killed, type="response") # significant
-cld_main<-cld(emm_main, method='tukey', alpha=0.05, adjust='fdr', Letters=LETTERS, sort=TRUE, reversed=TRUE) # fdr or sidak
-cld_interact<-cld(emm_interact, method='tukey', alpha=0.05, adjust='fdr', Letters=LETTERS, sort=TRUE, reversed=TRUE) # fdr or sidak
-# Plot the data
-# main effects #
-ggplot(cld_main, aes(x = humic, y = emmean, color=humic)) +
-  geom_point(data=plant.3,mapping=aes(x=humic, y=rt_mass_g), alpha=0.2, position=position_jitter(width = 0.2,height=0.03), size=3) +
-  geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), size=1, linewidth = 1.1) +
-  theme_classic(base_size = 10) +
-  facet_grid(.~Active.or.killed,labeller = labeller(Active.or.killed = c("A" = "Active", "K" = "Autoclaved"))) +
-  geom_text(aes(label=.group, y = upper.CL+0.1),color="black",size=4, vjust=-0.5,hjust=0.5) +
-  scale_x_discrete(labels=c("humic"="humic acid","no"="no humic acid")) +
-  scale_color_manual(values=c("#704776", "#f0be39"),limits=c("humic","no"),labels = c("humic","no humic")) +
-  xlab("Treatment")+
-  ylab("Dry Root Mass (g)")+
-    theme(legend.title = element_text(size=10,family="sans"), 
-      legend.text=element_text(size=10,family="sans"),
-      legend.position="none",
-      legend.box.spacing = unit(0.0, "pt"),
-      legend.spacing.x = unit(5.0, 'pt'),
-      axis.title.x= element_text(size=10, family="sans", vjust = 0.4),
-      strip.text.x = element_text(size = 10),
-      axis.title.y=element_text(size=10, family="sans",vjust = 1), 
-      panel.background = element_rect(colour = "black",linewidth=1),
-      #strip.background=element_blank(),
-      panel.grid.major = element_blank(), 
-      panel.grid.minor = element_blank(),
-      panel.spacing=unit(0.5, "lines"),
-      axis.text.x= element_text(colour="black", size=8, family="sans", angle=0, hjust=0.5), 
-      axis.text.y= element_text(colour="black", size=8, family="sans"))
-ggsave(filename= "GH.root_mass.humic.active.emm.pdf", device="pdf", units="mm", dpi=300, width=65, height=100, path="plots/")
-
-# Interactions #
-ggplot(cld_interact, aes(x = mulch, y = emmean,color=gly)) +
-  geom_point(data=plant.3,mapping=aes(x=mulch, y=rt_mass_g,color=gly), alpha=0.2,
-             position=position_jitterdodge(dodge.width = 1,jitter.width = 0.2,jitter.height = 0.03), size=3) +
-  geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), size=1, linewidth = 1.1,position = position_dodge2(1.0)) +
-  theme_classic(base_size = 10) +
-  facet_grid(.~Active.or.killed,labeller = labeller(Active.or.killed = c("A" = "Active", "K" = "Autoclaved"))) +
-  geom_text(aes(label=.group, y = upper.CL+0.1),color="black",size=4, vjust=-0.5,hjust=0.5,position = position_dodge2(1.0)) +
-  scale_color_manual(values=c("#25533f", "#aacc96"),limits=c("gly","no"),labels = c("glyphosate","no glyphosate")) +
-  xlab("Treatment")+
-  ylab("Dry Root Mass (g)")+
-  theme(legend.title = element_text(size=10,family="sans"), 
-        legend.text=element_text(size=10,family="sans"),
-        legend.position="none",
-        legend.box.spacing = unit(0.0, "pt"),
-        legend.spacing.x = unit(5.0, 'pt'),
-        axis.title.x= element_text(size=10, family="sans", vjust = 0.4),
-        strip.text.x = element_text(size = 10),
-        axis.title.y=element_text(size=10, family="sans",vjust = 1), 
-        panel.background = element_rect(colour = "black",linewidth=1),
-        #strip.background=element_blank(),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.spacing=unit(0.5, "lines"),
-        axis.text.x= element_text(colour="black", size=8, family="sans", angle=0, hjust=0.5), 
-        axis.text.y= element_text(colour="black", size=8, family="sans"))
-ggsave(filename= "GH.root_mass.mulch.gly.active.emm.pdf", device="pdf", units="mm", dpi=300, width=80, height=100, path="plots/")
-
-########################
-### Shoot biomass #####
-#######################
-# Plot raw data to identify major outliers
-ggplot(plant.3, aes(x=Soil, y= sht_mass_g,color=Active.or.killed)) + 
-  geom_boxplot(outliers = FALSE) +
-  geom_point(alpha=0.2, position=position_jitterdodge(0.2), size=2) +
-  geom_text(aes(label=Placement), position=position_jitterdodge(0.2), 
-            vjust=-0.5, size=3, alpha=0.7, check_overlap=TRUE) +
-  theme_classic()
-# remove major outliers from the dataset to improve model fit
-outliers<-as.character(c("D1_27","D3_25","C2_3","D3_23")) 
-plant.3<-plant.2 %>% filter(!Placement %in% outliers)# model
-# model
-#m_sht <- lmer((sht_mass_g) ~ mulch*Active.or.killed*humic*gly + (1|Block),data = plant.3)
-m_sht <- lmer(sht_mass_g ~ mulch*Active.or.killed*humic+ (1|Block),data = plant.3)
-ranova(m_sht) # block is significant
-plot(m_sht)
-qqnorm(resid(m_sht));qqline(resid(m_sht))
-anova(m_sht)
-#.                                   Df   Sum Sq Mean Sq F value    Pr(>F)    
-# mulch                        0.014034 0.014034     1 165.30  6.4381   0.01210 *  
-# Active.or.killed             0.051825 0.051825     1 165.38 23.7741 2.526e-06 ***
-# humic                        0.038529 0.038529     1 166.13 17.6750 4.272e-05 ***
-# mulch:Active.or.killed       0.008686 0.008686     1 165.67  3.9844   0.04756 *  
-# mulch:humic                  0.002827 0.002827     1 165.84  1.2970   0.25640    
-# Active.or.killed:humic       0.004746 0.004746     1 166.57  2.1773   0.14195    
-# mulch:Active.or.killed:humic 0.013430 0.013430     1 166.20  6.1609   0.01405 * 
-## Plot Sht mass ####
-emm_main<-emmeans(m_sht, specs=~mulch:humic:Active.or.killed, type="response") # significant
-#emm_interact<-emmeans(m_sht, specs=~mulch:gly:Active.or.killed, type="response") # significant
-cld_main<-cld(emm_main, method='tukey', alpha=0.05, adjust='fdr', Letters=LETTERS, sort=TRUE, reversed=TRUE) # fdr or sidak
-#cld_interact<-cld(emm_interact, method='tukey', alpha=0.05, adjust='fdr', Letters=LETTERS, sort=TRUE, reversed=TRUE) # fdr or sidak
-# Plot the data
-# main effects #
-ggplot(cld_main, aes(x = mulch, y = response,color=humic)) +
-  geom_point(data=plant.3,mapping=aes(x=mulch, y=sht_mass_g,color=humic), alpha=0.2,
-             position=position_jitterdodge(dodge.width = 1,jitter.width = 0.2,jitter.height = 0.01), size=3) +
-  geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), size=1, linewidth = 1.1,position = position_dodge2(1.0)) +
-  theme_classic(base_size = 10) +
-  facet_grid(.~Active.or.killed,labeller = labeller(Active.or.killed = c("A" = "Active", "K" = "Autoclaved"))) +
-  geom_text(aes(label=.group, y = upper.CL+0.08),color="black",size=4, vjust=-0.5,hjust=0.5,position = position_dodge2(1.0)) +
-  scale_color_manual(values=c("#704776", "#f0be39"),limits=c("humic","no"),labels = c("humic","no humic")) +
-  ylab("Dry Shoot Mass (g)")+
-  xlab("Treatment")+
-  theme(legend.title = element_text(size=10,family="sans"), 
-        legend.text=element_text(size=10,family="sans"),
-        legend.position="none",
-        legend.box.spacing = unit(0.0, "pt"),
-        legend.spacing.x = unit(5.0, 'pt'),
-        axis.title.x= element_text(size=10, family="sans", vjust = 0.4),
-        strip.text.x = element_text(size = 10),
-        axis.title.y=element_text(size=10, family="sans",vjust = 1), 
-        panel.background = element_rect(colour = "black",linewidth=1),
-        #strip.background=element_blank(),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.spacing=unit(0.5, "lines"),
-        axis.text.x= element_text(colour="black", size=8, family="sans", angle=0, hjust=0.5), 
-        axis.text.y= element_text(colour="black", size=8, family="sans"))
-ggsave(filename= "GH.sht_mass.mulch.humic.active.emm.pdf", device="pdf", units="mm", dpi=300, width=80, height=100, path="plots/")
-
-########################
-### Shoot height #####
-#######################
-# Plot raw data to identify major outliers
-ggplot(plant.3, aes(x=Soil, y= ht_cm,color=Active.or.killed)) + 
-  geom_boxplot(outliers = FALSE) +
-  geom_point(alpha=0.2, position=position_jitterdodge(0.2), size=2) +
-  geom_text(aes(label=Placement), position=position_jitterdodge(0.2), 
-            vjust=-0.5, size=3, alpha=0.7, check_overlap=TRUE) +
-  theme_classic()
-# remove major outliers from the dataset to improve model fit
-outliers<-as.character(c("D3_25","C2_3","C4_9","C2_3","D2_7")) 
-plant.3<-plant.2 %>% filter(!Placement %in% outliers)# model
-# model
-#m_sht <- lmer((ht_cm) ~ mulch*Active.or.killed*humic+gly + (1|Block),data = plant.3)
-m_sht <- lmer(ht_cm ~ mulch*Active.or.killed*humic+ (1|Block),data = plant.3)
-ranova(m_sht) # block is significant
-plot(m_sht)
-qqnorm(resid(m_sht));qqline(resid(m_sht))
-anova(m_sht)
-#.                             Sum Sq  Mean Sq NumDF  DenDF F value    Pr(>F)    
-# mulch                        18.897  18.897     1 165.24 11.7604  0.000764 ***
-# Active.or.killed             34.333  34.333     1 165.17 21.3670 7.610e-06 ***
-# humic                        47.157  47.157     1 166.03 29.3481 2.094e-07 ***
-# mulch:Active.or.killed       14.585  14.585     1 165.72  9.0768  0.002995 ** 
-# mulch:humic                  14.294  14.294     1 165.94  8.8956  0.003290 ** 
-# Active.or.killed:humic        5.543   5.543     1 166.37  3.4499  0.065022 .  
-# mulch:Active.or.killed:humic 29.380  29.380     1 166.23 18.2844 3.200e-05 ***
-## Plot Sht height ####
-emm_main<-emmeans(m_sht, specs=~mulch:humic:Active.or.killed, type="response") # significant
-#emm_interact<-emmeans(m_sht, specs=~mulch:gly:Active.or.killed, type="response") # significant
-cld_main<-cld(emm_main, method='tukey', alpha=0.05, adjust='fdr', Letters=LETTERS, sort=TRUE, reversed=TRUE) # fdr or sidak
-#cld_interact<-cld(emm_interact, method='tukey', alpha=0.05, adjust='fdr', Letters=LETTERS, sort=TRUE, reversed=TRUE) # fdr or sidak
-# Plot the data
-# main effects #
-ggplot(cld_main, aes(x = mulch, y = response,color=humic)) +
-  geom_point(data=plant.3,mapping=aes(x=mulch, y=ht_cm,color=humic), alpha=0.2,
-             position=position_jitterdodge(dodge.width = 1,jitter.width = 0.2,jitter.height = 0.01), size=3) +
-  geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), size=1, linewidth = 1.1,position = position_dodge2(1.0)) +
-  theme_classic(base_size = 10) +
-  facet_grid(.~Active.or.killed,labeller = labeller(Active.or.killed = c("A" = "Active", "K" = "Autoclaved"))) +
-  geom_text(aes(label=.group, y = upper.CL+0.08),color="black",size=4, vjust=-0.5,hjust=0.5,position = position_dodge2(1.0)) +
-  scale_color_manual(values=c("#704776", "#f0be39"),limits=c("humic","no"),labels = c("humic","no humic")) +
-  ylab("Shoot Height (cm)")+
-  xlab("Treatment")+
-  theme(legend.title = element_text(size=10,family="sans"), 
-        legend.text=element_text(size=10,family="sans"),
-        legend.position="none",
-        legend.box.spacing = unit(0.0, "pt"),
-        legend.spacing.x = unit(5.0, 'pt'),
-        axis.title.x= element_text(size=10, family="sans", vjust = 0.4),
-        strip.text.x = element_text(size = 10),
-        axis.title.y=element_text(size=10, family="sans",vjust = 1), 
-        panel.background = element_rect(colour = "black",linewidth=1),
-        #strip.background=element_blank(),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.spacing=unit(0.5, "lines"),
-        axis.text.x= element_text(colour="black", size=8, family="sans", angle=0, hjust=0.5), 
-        axis.text.y= element_text(colour="black", size=8, family="sans"))
-ggsave(filename= "GH.sht_height.mulch.humic.active.emm.pdf", device="pdf", units="mm", dpi=300, width=80, height=100, path="plots/")
-
