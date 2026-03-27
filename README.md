@@ -4,10 +4,11 @@ Code and data associated with the Ginnan et al. (2026) manuscript 'Orchard manag
 ## Field tree root/rhizo microbiome analyses
 ### Data file(s)
 - These phyloseq objects were produced from raw reads using the workflow outlined here: [ECDRE.Microbiome.Amp-seq.processing repository](<../ECDRE Microbiomes/README.md>)
-[Bacterial CLR transformed phyloseq object (.RDS)](Microbiome.analyses/CA.CLR.16S.greengenes.phyloseq.obj.RDS)   
-[Fungal CLR transformed phyloseq object (.RDS)](Microbiome.analyses/CA.CLR.ITS.UNITE.phyloseq.obj.RDS)    
-[Bacterial raw counts phyloseq object (.RDS)](Microbiome.analyses/CA.raw.counts.16S.greengenes.phyloseq.obj.RDS)    
-[Fungal raw counts phyloseq object (.RDS)](Microbiome.analyses/CA.raw.counts.ITS.UNITE.phyloseq.obj.RDS). 
+
+- [Bacterial CLR transformed phyloseq object (.RDS)](Microbiome.analyses/CA.CLR.16S.greengenes.phyloseq.obj.RDS)   
+- [Fungal CLR transformed phyloseq object (.RDS)](Microbiome.analyses/CA.CLR.ITS.UNITE.phyloseq.obj.RDS)    
+- [Bacterial raw counts phyloseq object (.RDS)](Microbiome.analyses/CA.raw.counts.16S.greengenes.phyloseq.obj.RDS)    
+- [Fungal raw counts phyloseq object (.RDS)](Microbiome.analyses/CA.raw.counts.ITS.UNITE.phyloseq.obj.RDS). 
 ### Code file
 [Microbiome analyses R code (.R)](Microbiome.analyses/Final_figures_CA_citrus_microbiome.R)
 
