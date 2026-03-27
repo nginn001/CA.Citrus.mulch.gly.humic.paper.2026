@@ -21,6 +21,7 @@ Code and data associated with the Ginnan et al. (2026) manuscript 'Orchard manag
 ## Greenhouse plant analyses
 ### Data file(s)
 [Greenhouse experiment data excel file (.xlsx)](<greenhouse.experiment/Sup.Table.S4. Greenhouse Plant Data.xlsx>)
+- This is Supplemental Table S4 in the manuscript
 ### Code file
 [Greenhouse experiment plant analyses R code (.R)](greenhouse.experiment/greenhouse.plant.analyses.R)
 
