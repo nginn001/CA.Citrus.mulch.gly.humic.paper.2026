@@ -3,7 +3,7 @@ Code and data associated with the Ginnan et al. (2026) manuscript 'Orchard manag
 
 ## Field tree root/rhizo microbiome analyses
 ### Data file(s)
-- These phyloseq objects were produced from raw reads using the workflow outlined here: [ECDRE.Microbiome.Amp-seq.processing repository](<../ECDRE Microbiomes/README.md>)
+These phyloseq objects were produced from raw reads using the workflow outlined here: [ECDRE.Microbiome.Amp-seq.processing repository](<../ECDRE Microbiomes/README.md>)
 
 - [Bacterial CLR transformed phyloseq object (.RDS)](Microbiome.analyses/CA.CLR.16S.greengenes.phyloseq.obj.RDS)   
 - [Fungal CLR transformed phyloseq object (.RDS)](Microbiome.analyses/CA.CLR.ITS.UNITE.phyloseq.obj.RDS)    
