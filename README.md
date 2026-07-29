@@ -18,7 +18,7 @@ These phyloseq objects were produced from raw reads using the workflow outlined 
 ## Field tree plant and weed analyses
 #### Data file(s)
 [Field experiment plant data excel file (.xlsx)](<field.experiment/Sup.Table.S6.FieldPlantData.xlsx>)
-- This is Supplemental Table S3 in the manuscript
+- This is Supplemental Table S6 in the manuscript
 #### Code file
 [Field experiment plant analyses R code (.R)](field.experiment/Final.field.plant.data.analyses.R)
 
@@ -26,7 +26,7 @@ These phyloseq objects were produced from raw reads using the workflow outlined 
 ## Greenhouse plant analyses
 #### Data file(s)
 [Greenhouse experiment data excel file (.xlsx)](<greenhouse.experiment/Sup.Table.S9.Greenhouse.Plant.Data.xlsx>)
-- This is Supplemental Table S4 in the manuscript
+- This is Supplemental Table S9 in the manuscript
 #### Code file
 [Greenhouse experiment plant analyses R code (.R)](greenhouse.experiment/revised.greenhouse.plant.analyses.R)
 
